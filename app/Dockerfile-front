@@ -1,0 +1,17 @@
+FROM node:18-alpine
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers du projet
+COPY package.json .
+COPY . .
+
+# Installer les dépendances
+RUN npm install && npm run build
+
+# Exposer le port
+EXPOSE 3000
+
+# Lancer le frontend
+CMD ["npm", "start"]
