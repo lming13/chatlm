@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatlm-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatlm-frontend
+  template:
+    metadata:
+      labels:
+        app: chatlm-frontend
+    spec:
+      containers:
+      - name: chatlm-frontend
+        image: docker.io/lmingus/chatlm-frontend:v1
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatlm-frontend-service
+spec:
+  selector:
+    app: chatlm-frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatlm-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatlm-backend
+  template:
+    metadata:
+      labels:
+        app: chatlm-backend
+    spec:
+      containers:
+      - name: chatlm-backend
+        image: docker.io/lmingus/chatlm-backend:v1
+        ports:
+        - containerPort: 8001
+        env:
+        - name: CHATBOT_API_URL
+          value: "http://chatbot-service:8000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatlm-backend-service
+spec:
+  selector:
+    app: chatlm-backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8001
+  type: ClusterIP
